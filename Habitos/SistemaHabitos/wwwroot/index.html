@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Seguimiento de Hábitos</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+<aside id="sidebar">
+    <div class="brand">
+        <h5><i class="bi bi-activity"></i> HabitTracker</h5>
+        <p>Seguimiento de Hábitos</p>
+    </div>
+    <nav>
+        <a href="#" onclick="nav('dashboard')" id="nav-dashboard" class="active"><i class="bi bi-house-door"></i> Dashboard</a>
+        <a href="#" onclick="nav('usuarios')" id="nav-usuarios"><i class="bi bi-people"></i> Usuarios</a>
+        <a href="#" onclick="nav('categorias')" id="nav-categorias"><i class="bi bi-tag"></i> Categorías</a>
+        <a href="#" onclick="nav('habitos')" id="nav-habitos"><i class="bi bi-check2-circle"></i> Hábitos</a>
+        <a href="#" onclick="nav('registros')" id="nav-registros"><i class="bi bi-calendar-check"></i> Registros</a>
+        <a href="#" onclick="nav('metas')" id="nav-metas"><i class="bi bi-trophy"></i> Metas</a>
+        <a href="#" onclick="nav('estadisticas')" id="nav-estadisticas"><i class="bi bi-bar-chart"></i> Estadísticas</a>
+    </nav>
+</aside>
+
+
+<div id="main">
+    <div class="topbar">
+        <h4 id="page-title">Dashboard</h4>
+        <div class="d-flex align-items-center gap-3">
+            <span id="fecha-hoy" style="font-size:13px;color:#64748b;"></span>
+        </div>
+    </div>
+
+    <div class="content">
+
+      
+        <section id="sec-dashboard" class="section active">
+            <div class="row g-3 mb-4">
+                <div class="col-sm-6 col-xl-3">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background:#ede9fe;color:#7c3aed;"><i class="bi bi-check2-circle"></i></div>
+                        <div>
+                            <div class="stat-value" id="dash-habitos-activos">—</div>
+                            <div class="stat-label">Hábitos Activos</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background:#dcfce7;color:#16a34a;"><i class="bi bi-calendar-check"></i></div>
+                        <div>
+                            <div class="stat-value" id="dash-completados-hoy">—</div>
+                            <div class="stat-label">Completados Hoy</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background:#fff7ed;color:#ea580c;"><i class="bi bi-fire"></i></div>
+                        <div>
+                            <div class="stat-value" id="dash-racha">—</div>
+                            <div class="stat-label">Racha Actual</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background:#fef9c3;color:#ca8a04;"><i class="bi bi-percent"></i></div>
+                        <div>
+                            <div class="stat-value" id="dash-tasa">—</div>
+                            <div class="stat-label">Cumplimiento Mes</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-lg-7">
+                    <div class="table-card">
+                        <div class="table-header">
+                            <h6><i class="bi bi-sun me-2"></i>Hábitos de Hoy</h6>
+                            <div class="date-nav">
+                                <button class="btn-icon" onclick="cambiarFecha(-1)"><i class="bi bi-chevron-left"></i></button>
+                                <span id="fecha-display"></span>
+                                <button class="btn-icon" onclick="cambiarFecha(1)"><i class="bi bi-chevron-right"></i></button>
+                            </div>
+                        </div>
+                        <div style="padding:16px;" id="dash-usuario-select-wrap">
+                            <select class="form-control-custom" id="dash-usuario" onchange="loadDashboard()" style="max-width:240px;">
+                                <option value="">Selecciona un usuario...</option>
+                            </select>
+                        </div>
+                        <div id="dash-habitos-list" style="padding:0 16px 16px;display:flex;flex-direction:column;gap:8px;"></div>
+                    </div>
+                </div>
+                <div class="col-lg-5">
+                    <div class="table-card">
+                        <div class="table-header"><h6><i class="bi bi-trophy me-2"></i>Metas Activas</h6></div>
+                        <div id="dash-metas-list" style="padding:16px;display:flex;flex-direction:column;gap:12px;"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+      
+        <section id="sec-usuarios" class="section">
+            <div class="table-card">
+                <div class="table-header">
+                    <h6>Usuarios</h6>
+                    <button class="btn-primary-custom" onclick="openModal('usuario')"><i class="bi bi-plus-lg"></i> Nuevo</button>
+                </div>
+                <table class="table">
+                    <thead><tr><th>ID</th><th>Nombre</th><th>Email</th><th>Fecha Reg.</th><th>Estado</th><th></th></tr></thead>
+                    <tbody id="tabla-usuarios"></tbody>
+                </table>
+            </div>
+        </section>
+
+    
+        <section id="sec-categorias" class="section">
+            <div class="table-card">
+                <div class="table-header">
+                    <h6>Categorías de Hábitos</h6>
+                    <button class="btn-primary-custom" onclick="openModal('categoria')"><i class="bi bi-plus-lg"></i> Nueva</button>
+                </div>
+                <table class="table">
+                    <thead><tr><th>ID</th><th>Nombre</th><th>Hábitos</th><th></th></tr></thead>
+                    <tbody id="tabla-categorias"></tbody>
+                </table>
+            </div>
+        </section>
+
+        
+        <section id="sec-habitos" class="section">
+            <div class="table-card">
+                <div class="table-header">
+                    <h6>Hábitos</h6>
+                    <button class="btn-primary-custom" onclick="openModal('habito')"><i class="bi bi-plus-lg"></i> Nuevo</button>
+                </div>
+                <table class="table">
+                    <thead><tr><th>ID</th><th>Nombre</th><th>Frecuencia</th><th>Categoría</th><th>Usuario</th><th>Recordatorio</th><th>Estado</th><th></th></tr></thead>
+                    <tbody id="tabla-habitos"></tbody>
+                </table>
+            </div>
+        </section>
+
+       
+        <section id="sec-registros" class="section">
+            <div class="table-card">
+                <div class="table-header">
+                    <h6>Registros Diarios</h6>
+                    <button class="btn-primary-custom" onclick="openModal('registro')"><i class="bi bi-plus-lg"></i> Nuevo</button>
+                </div>
+                <div style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;gap:12px;flex-wrap:wrap;">
+                    <select class="form-control-custom" id="filtro-usuario-registro" onchange="loadRegistros()" style="max-width:180px;">
+                        <option value="">Todos los usuarios</option>
+                    </select>
+                    <input type="date" class="form-control-custom" id="filtro-fecha-registro" onchange="loadRegistros()" style="max-width:160px;">
+                </div>
+                <table class="table">
+                    <thead><tr><th>ID</th><th>Hábito</th><th>Fecha</th><th>Estado</th><th>Nota</th><th></th></tr></thead>
+                    <tbody id="tabla-registros"></tbody>
+                </table>
+            </div>
+        </section>
+
+  
+        <section id="sec-metas" class="section">
+            <div class="table-card">
+                <div class="table-header">
+                    <h6>Metas</h6>
+                    <button class="btn-primary-custom" onclick="openModal('meta')"><i class="bi bi-plus-lg"></i> Nueva</button>
+                </div>
+                <table class="table">
+                    <thead><tr><th>ID</th><th>Nombre</th><th>Hábito</th><th>Usuario</th><th>Período</th><th>Objetivo</th><th>Progreso</th><th>Estado</th><th></th></tr></thead>
+                    <tbody id="tabla-metas"></tbody>
+                </table>
+            </div>
+        </section>
+
+        
+        <section id="sec-estadisticas" class="section">
+            <div class="mb-3" style="max-width:280px;">
+                <select class="form-control-custom" id="est-usuario" onchange="loadEstadisticas()">
+                    <option value="">Selecciona un usuario...</option>
+                </select>
+            </div>
+            <div id="est-contenido" style="display:none;">
+                <div class="row g-3 mb-4">
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background:#ede9fe;color:#7c3aed;"><i class="bi bi-check2-circle"></i></div>
+                            <div><div class="stat-value" id="est-habitos-activos">0</div><div class="stat-label">Hábitos Activos</div></div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background:#fff7ed;color:#ea580c;"><i class="bi bi-fire"></i></div>
+                            <div><div class="stat-value" id="est-racha">0</div><div class="stat-label">Racha Actual</div></div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background:#fef9c3;color:#ca8a04;"><i class="bi bi-percent"></i></div>
+                            <div><div class="stat-value" id="est-tasa">0%</div><div class="stat-label">Cumplimiento Mes</div></div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background:#dcfce7;color:#16a34a;"><i class="bi bi-trophy"></i></div>
+                            <div><div class="stat-value" id="est-metas">0/0</div><div class="stat-label">Metas Completadas</div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-lg-6">
+                        <div class="table-card" style="padding:20px;">
+                            <h6 style="margin-bottom:16px;">Detalle por Hábito</h6>
+                            <select class="form-control-custom mb-3" id="est-habito-sel" onchange="loadHabitoStats()">
+                                <option value="">Selecciona un hábito...</option>
+                            </select>
+                            <div id="est-habito-stats"></div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="table-card" style="padding:20px;">
+                            <h6 style="margin-bottom:16px;">Historial Mensual</h6>
+                            <div class="chart-container">
+                                <canvas id="chartMensual"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+
+<div class="modal-custom" id="modal-usuario">
+    <div class="modal-box">
+        <h5 id="modal-usuario-title">Nuevo Usuario</h5>
+        <input type="hidden" id="usu-id">
+        <div class="form-group"><label>Nombre</label><input class="form-control-custom" id="usu-nombre" placeholder="Nombre completo"></div>
+        <div class="form-group"><label>Email</label><input class="form-control-custom" id="usu-email" type="email" placeholder="correo@ejemplo.com"></div>
+        <div class="form-group"><label>Contraseña</label><input class="form-control-custom" id="usu-pass" type="password" placeholder="Contraseña"></div>
+        <div class="form-group">
+            <label>Estado</label>
+            <select class="form-control-custom" id="usu-activo">
+                <option value="true">Activo</option>
+                <option value="false">Inactivo</option>
+            </select>
+        </div>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeModal('usuario')">Cancelar</button>
+            <button class="btn-primary-custom" onclick="saveUsuario()"><i class="bi bi-check-lg"></i> Guardar</button>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal-custom" id="modal-categoria">
+    <div class="modal-box">
+        <h5 id="modal-categoria-title">Nueva Categoría</h5>
+        <input type="hidden" id="cat-id">
+        <div class="form-group"><label>Nombre</label><input class="form-control-custom" id="cat-nombre" placeholder="Ej: Salud, Fitness, Productividad..."></div>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeModal('categoria')">Cancelar</button>
+            <button class="btn-primary-custom" onclick="saveCategoria()"><i class="bi bi-check-lg"></i> Guardar</button>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal-custom" id="modal-habito">
+    <div class="modal-box" style="max-width:540px;">
+        <h5 id="modal-habito-title">Nuevo Hábito</h5>
+        <input type="hidden" id="hab-id">
+        <div class="row g-2">
+            <div class="col-12">
+                <div class="form-group"><label>Nombre</label><input class="form-control-custom" id="hab-nombre" placeholder="Ej: Meditar 10 minutos"></div>
+            </div>
+            <div class="col-12">
+                <div class="form-group"><label>Descripción</label><input class="form-control-custom" id="hab-descripcion" placeholder="Opcional"></div>
+            </div>
+            <div class="col-6">
+                <div class="form-group">
+                    <label>Frecuencia</label>
+                    <select class="form-control-custom" id="hab-frecuencia">
+                        <option value="0">Diario</option>
+                        <option value="1">Semanal</option>
+                        <option value="2">Mensual</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group"><label>Hora Recordatorio</label><input class="form-control-custom" id="hab-hora" type="time"></div>
+            </div>
+            <div class="col-6">
+                <div class="form-group">
+                    <label>Usuario</label>
+                    <select class="form-control-custom" id="hab-usuario"></select>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group">
+                    <label>Categoría</label>
+                    <select class="form-control-custom" id="hab-categoria"></select>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="form-group"><label>Color</label><input class="form-control-custom" id="hab-color" type="color" value="#6366f1" style="height:38px;padding:4px;"></div>
+            </div>
+            <div class="col-4">
+                <div class="form-group"><label>Ícono (emoji)</label><input class="form-control-custom" id="hab-icono" placeholder="🏃"></div>
+            </div>
+            <div class="col-4">
+                <div class="form-group">
+                    <label>Estado</label>
+                    <select class="form-control-custom" id="hab-activo">
+                        <option value="true">Activo</option>
+                        <option value="false">Inactivo</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeModal('habito')">Cancelar</button>
+            <button class="btn-primary-custom" onclick="saveHabito()"><i class="bi bi-check-lg"></i> Guardar</button>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal-custom" id="modal-registro">
+    <div class="modal-box">
+        <h5 id="modal-registro-title">Nuevo Registro</h5>
+        <input type="hidden" id="reg-id">
+        <div class="form-group">
+            <label>Hábito</label>
+            <select class="form-control-custom" id="reg-habito"></select>
+        </div>
+        <div class="form-group"><label>Fecha</label><input class="form-control-custom" id="reg-fecha" type="date"></div>
+        <div class="form-group">
+            <label>Estado</label>
+            <select class="form-control-custom" id="reg-completado">
+                <option value="true">Completado</option>
+                <option value="false">No Completado</option>
+            </select>
+        </div>
+        <div class="form-group"><label>Nota (opcional)</label><input class="form-control-custom" id="reg-nota" placeholder="Observación..."></div>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeModal('registro')">Cancelar</button>
+            <button class="btn-primary-custom" onclick="saveRegistro()"><i class="bi bi-check-lg"></i> Guardar</button>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal-custom" id="modal-meta">
+    <div class="modal-box" style="max-width:540px;">
+        <h5 id="modal-meta-title">Nueva Meta</h5>
+        <input type="hidden" id="meta-id">
+        <div class="row g-2">
+            <div class="col-12">
+                <div class="form-group"><label>Nombre</label><input class="form-control-custom" id="meta-nombre" placeholder="Ej: 30 días de meditación"></div>
+            </div>
+            <div class="col-12">
+                <div class="form-group"><label>Descripción</label><input class="form-control-custom" id="meta-descripcion" placeholder="Opcional"></div>
+            </div>
+            <div class="col-6">
+                <div class="form-group">
+                    <label>Usuario</label>
+                    <select class="form-control-custom" id="meta-usuario" onchange="loadHabitosPorUsuario('meta-habito', this.value)"></select>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group">
+                    <label>Hábito</label>
+                    <select class="form-control-custom" id="meta-habito"></select>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="form-group"><label>Fecha Inicio</label><input class="form-control-custom" id="meta-inicio" type="date"></div>
+            </div>
+            <div class="col-4">
+                <div class="form-group"><label>Fecha Fin</label><input class="form-control-custom" id="meta-fin" type="date"></div>
+            </div>
+            <div class="col-4">
+                <div class="form-group"><label>Objetivo (días)</label><input class="form-control-custom" id="meta-objetivo" type="number" min="1" placeholder="30"></div>
+            </div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeModal('meta')">Cancelar</button>
+            <button class="btn-primary-custom" onclick="saveMeta()"><i class="bi bi-check-lg"></i> Guardar</button>
+        </div>
+    </div>
+</div>
+
+
+<div class="alert-toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="/js/app.js"></script>
+</body>
+</html>
