@@ -194,7 +194,7 @@ body {
     transition: width .5s ease;
 }
 
-/
+
 .btn-primary-custom {
     background: var(--primary);
     color: white;

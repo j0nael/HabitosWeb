@@ -87,7 +87,6 @@ public class UsuarioController : ControllerBase
             .Include(u => u.Metas)
             .FirstOrDefaultAsync(u => u.Id == id);
         if (entity == null) return NotFound("Usuario no encontrado.");
-        if (entity.Habitos.Any()) return BadRequest("No se puede eliminar, el usuario tiene hábitos registrados.");
         _context.Usuarios.Remove(entity);
         await _context.SaveChangesAsync();
         return NoContent();
